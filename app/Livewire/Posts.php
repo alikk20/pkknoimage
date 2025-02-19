@@ -7,7 +7,7 @@ use App\Models\Post;
   
 class Posts extends Component
 {
-    public $posts, $title, $content, $post_id;
+    public $title, $content, $post_id;
     public $isOpen = 0;
   
     /**
@@ -17,8 +17,8 @@ class Posts extends Component
      */
     public function render()
     {
-        $this->posts = Post::all();
-        return view('livewire.posts');
+        $posts = Post::paginate(5);
+        return view('livewire.posts', compact('posts'));
     }
   
     /**
