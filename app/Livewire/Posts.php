@@ -9,65 +9,46 @@ class Posts extends Component
 {
     public $title, $content, $post_id;
     public $isOpen = 0;
-  
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array
-     */
+    public $search;
+    public $updatesQueryString = [
+        ['search' => ['except' => '']]
+    ];
+
+    public function mount(){
+        $this->search =request()->query('search', $this->search);
+    }
+
     public function render()
     {
-        $posts = Post::paginate(5);
-        return view('livewire.posts', compact('posts'));
+        $posts = Post::where('title', 'like', '%' . $this->search . '%')
+                    ->orWhere('content', 'like', '%' . $this->search . '%')
+                    ->paginate(4);
+        return view('livewire.posts',['posts'=>$posts]);
     }
+    
   
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array
-     */
     public function create()
     {
         $this->resetInputFields();
         $this->openModal();
     }
-  
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array
-     */
+
     public function openModal()
     {
         $this->isOpen = true;
     }
-  
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array
-     */
+
     public function closeModal()
     {
         $this->isOpen = false;
     }
-  
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array
-     */
+
     private function resetInputFields(){
         $this->title = '';
         $this->content = '';
         $this->post_id = '';
     }
-     
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array
-     */
+
     public function store()
     {
         $this->validate([
@@ -82,16 +63,12 @@ class Posts extends Component
   
         session()->flash('message', 
             $this->post_id ? 'Post Updated Successfully.' : 'Post Created Successfully.');
-  
+            return redirect()->to('/posts');
+
         $this->closeModal();
         $this->resetInputFields();
     }
-  
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array
-     */
+
     public function edit($id)
     {
         $post = Post::findOrFail($id);
@@ -101,15 +78,11 @@ class Posts extends Component
     
         $this->openModal();
     }
-     
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array
-     */
+
     public function delete($id)
     {
         Post::find($id)->delete();
         session()->flash('message', 'Post Deleted Successfully.');
+        return redirect()->to('/posts');
     }
 }

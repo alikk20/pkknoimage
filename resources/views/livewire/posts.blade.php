@@ -16,6 +16,7 @@
 
             <div class="flex justify-between">
                 <h1 class="pt-4 text-xl font-bold">POST</h1>
+                <input type="text" wire:model.live="search" class="py-2 px-4 my-3 h-10 rounded items-center font-semibold" placeholder="Search...">
                 <button wire:click="create()" class="bg-blue-400 hover:bg-blue-500 text-white font-bold py-2 px-4 rounded my-3">Create New Post</button>
             </div>
             @if($isOpen)
@@ -32,9 +33,9 @@
                 </tr>
                 </thead>
                 <tbody>
-                    @foreach($posts as $post)
+                    @forelse($posts as $index => $post)
                         <tr>
-                            <td class="border px-4 py-2">{{ $post->id }}</td>
+                            <td class="border px-4 py-2">{{ ($posts->currentPage() - 1) * $posts->perPage() + $index + 1 }}</td>
                             <td class="border px-4 py-2">{{ $post->title }}</td>
                             <td class="border px-4 py-2">{{ $post->content }}</td>
                             <td class="border px-4 py-2 flex justify-center gap-2">
@@ -42,7 +43,11 @@
                                 <button wire:click="delete({{ $post->id }})" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">Delete</button>
                             </td>
                         </tr>
-                    @endforeach
+                    @empty
+                        <tr>
+                            <td colspan="4" class="border px-4 py-2 text-center text-gray-500 font-semibold">No data available</td>
+                        </tr>
+                    @endforelse
                 </tbody>
             </table>
             <div class="mt-4">
